@@ -7,64 +7,74 @@ import { countDue, deleteCard, deleteDeck, exportDeckCSV, getDeck, listCards, im
 import type { Card, Deck } from "@/lib/types";
 
 export default function DeckDetailPage() {
-  const params = useParams<{ deckId: string }>();
+  const params = useParams();
   const router = useRouter();
-  const deckId = params.deckId;
+  const deckId = params?.deckId as string;
+
   const [deck, setDeck] = useState<Deck | undefined>();
   const [cards, setCards] = useState<Card[]>([]);
   const refresh = () => { setDeck(getDeck(deckId)); setCards(listCards(deckId)); };
 
-  useEffect(() => { refresh(); }, [deckId]);
+  useEffect(() => { if (deckId) refresh(); }, [deckId]);
 
-  const due = useMemo(() => countDue(deckId), [deckId, cards]);
-
+  const due = useMemo(() => (deckId ? countDue(deckId) : 0), [deckId, cards]);
   const fileRef = useRef<HTMLInputElement>(null);
 
   if (!deck) return <p>Deck not found.</p>;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">{deck.title}</h1>
-          {deck.description && <p className="text-sm opacity-70">{deck.description}</p>}
+          <h1 className="text-3xl font-bold">{deck.title}</h1>
+          {deck.description && <p className="text-muted">{deck.description}</p>}
         </div>
         <div className="flex gap-2">
-          <Link className="rounded-2xl bg-black text-white px-4 py-2" href={`/study/${deckId}`}>Study ({due} due)</Link>
-          <button className="rounded-2xl border px-4 py-2" onClick={() => downloadCSV(deckId, deck.title)}>Export CSV</button>
-          <button className="rounded-2xl border px-4 py-2" onClick={() => fileRef.current?.click()}>Import CSV</button>
+          <Link className="btn btn-primary" href={`/study/${deckId}`}>Study ({due} due)</Link>
+          <button className="btn btn-outline" onClick={() => downloadCSV(deckId, deck.title)}>Export CSV</button>
+          <button className="btn btn-outline" onClick={() => fileRef.current?.click()}>Import CSV</button>
           <input ref={fileRef} type="file" accept=".csv,text/csv" className="hidden" onChange={handleImport} />
-          <button className="rounded-2xl border px-4 py-2 text-red-600" onClick={() => { if(confirm("Delete deck and all cards?")){ deleteDeck(deckId); router.push("/decks"); } }}>Delete</button>
+          <button
+            className="btn btn-outline"
+            onClick={() => { if (confirm("Delete deck and all cards?")) { deleteDeck(deckId); router.push("/decks"); } }}
+          >
+            Delete
+          </button>
         </div>
       </div>
 
-      <section className="rounded-2xl border p-4 bg-white">
-        <h2 className="font-medium mb-2">Add a card</h2>
+      <section className="card p-5">
+        <h2 className="font-semibold mb-2">Add a card</h2>
         <CardForm deckId={deckId} onCreated={refresh} />
       </section>
 
       <section>
-        <h2 className="font-medium mb-2">Cards ({cards.length})</h2>
-        <div className="grid gap-3">
-          {cards.length === 0 && <p className="text-sm opacity-70">No cards yet.</p>}
+        <h2 className="font-semibold mb-2">Cards ({cards.length})</h2>
+        <div className="grid gap-4">
+          {cards.length === 0 && <p className="text-muted">No cards yet.</p>}
           {cards.map((c) => (
-            <div key={c.id} className="rounded-2xl border p-4 bg-white">
+            <div key={c.id} className="card p-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <div className="text-xs opacity-70 mb-1">Front</div>
+                  <div className="text-xs text-muted mb-1">Front</div>
                   <div className="whitespace-pre-wrap">{c.front}</div>
                 </div>
                 <div>
-                  <div className="text-xs opacity-70 mb-1">Back</div>
+                  <div className="text-xs text-muted mb-1">Back</div>
                   <div className="whitespace-pre-wrap">{c.back}</div>
                 </div>
               </div>
-              <div className="flex gap-2 mt-3 text-sm opacity-70">
+              <div className="flex flex-wrap gap-3 mt-3 text-sm text-muted">
                 <span>Due: {new Date(c.due).toLocaleString()}</span>
                 <span>· Interval: {c.interval}d</span>
                 <span>· Ease: {c.ease.toFixed(2)}</span>
                 <span>· Reps: {c.repetitions}</span>
-                <button onClick={()=>{ if(confirm("Delete card?")){ deleteCard(c.id); refresh(); } }} className="ml-auto text-red-600">Delete</button>
+                <button
+                  onClick={() => { if (confirm("Delete card?")) { deleteCard(c.id); refresh(); } }}
+                  className="ml-auto hover:opacity-80"
+                >
+                  Delete
+                </button>
               </div>
             </div>
           ))}

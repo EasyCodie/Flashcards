@@ -1,24 +1,67 @@
-/* Tailwind v4 core */
 @import "tailwindcss";
 
-/* (Optional) Light/Dark CSS variables you can use in components */
+/* Color tokens */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: 251 252 254;
+  --fg: 16 23 42;
+  --muted: 100 116 139;
+
+  --brand-600: 124 58 237;
+  --accent-500: 79 70 229;
+
+  --card: 255 255 255;
+  --border: 226 232 240;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg: 9 13 22;
+    --fg: 241 245 249;
+    --muted: 148 163 184;
+    --card: 17 24 39;
+    --border: 39 55 85;
   }
 }
 
-/* Base page styles (optional) */
+html { scroll-behavior: smooth; }
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: system-ui, Arial, Helvetica, sans-serif;
+  color: rgb(var(--fg));
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(139,92,246,0.12), transparent 60%),
+    radial-gradient(900px 500px at 10% -10%, rgba(79,70,229,0.12), transparent 60%),
+    rgb(var(--bg));
+  text-rendering: optimizeLegibility;
 }
 
-/* Avoid @apply for now to keep the editor happy with v4; 
-   we can style headings directly with Tailwind classes in JSX. */
+/* Components without @apply */
+.card {
+  background: color-mix(in oklab, rgba(var(--card),1) 90%, rgba(245,243,255,0.6));
+  border: 1px solid rgb(var(--border));
+  border-radius: 1.25rem;
+  box-shadow: 0 10px 25px -15px rgba(2,6,23,0.25);
+}
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0.5rem 1rem; border-radius: 1rem; font-weight: 600;
+  transition: all .3s ease;
+}
+.btn-primary {
+  color: #fff;
+  background: linear-gradient(135deg, rgb(var(--brand-600)), rgb(var(--accent-500)));
+  box-shadow: 0 10px 20px -10px rgba(79,70,229,0.6);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 12px 28px -12px rgba(79,70,229,0.7); }
+.btn-outline {
+  color: rgb(var(--fg));
+  border: 1px solid rgb(var(--border));
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(6px);
+}
+.btn-outline:hover { border-color: rgb(196 181 253); box-shadow: 0 6px 16px -8px rgba(2,6,23,0.2); }
+.input {
+  width: 100%; border: 1px solid rgb(var(--border)); border-radius: 1rem;
+  padding: .5rem .75rem; background: rgba(255,255,255,0.8);
+  transition: border-color .2s ease, outline-color .2s ease;
+}
+.input:focus { outline: 3px solid rgba(139,92,246,.25); border-color: rgb(167 139 250); }
+.text-muted { color: rgb(var(--muted)); }
+.shadow-soft { box-shadow: 0 12px 24px -16px rgba(2,6,23,0.35); }
