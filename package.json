@@ -6,7 +6,10 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:ui": "cross-env BASE_URL=http://localhost:3000 playwright test -c playwright.config.ts",
+    "test:ui:headed": "cross-env BASE_URL=http://localhost:3000 playwright test -c playwright.config.ts --headed",
+    "test:ui:debug": "cross-env BASE_URL=http://localhost:3000 PWDEBUG=1 playwright test -c playwright.config.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
